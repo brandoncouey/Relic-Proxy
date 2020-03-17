@@ -31,6 +31,7 @@ public class ProxyRouting {
     @Setter
     private static InetSocketAddress realmAddress;
 
+    //TODO do deregistering.
     /**
      * Represents the Connections
      */

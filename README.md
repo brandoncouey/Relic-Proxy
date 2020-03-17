@@ -14,4 +14,4 @@ Ability to deploy multiple instances around the world to provide players with be
 * **In order to deploy a *Relic-Proxy* instance - A valid *Relic-Central* instance must be up and running, with a valid connection.**
 
 This allows for proper authentication of an instance before our clients connect to them.
-A successful Relic-Central connection will provide information regarding all running **Relic-World** and **Relic-Realm** instances for the players to connect to.
+A successful **Relic-Central** connection will provide information regarding all running **Relic-World** and **Relic-Realm** instances for the players to connect to.

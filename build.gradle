@@ -21,8 +21,7 @@ repositories {
 
 
 dependencies {
-    compile "com.github.GrizzlyEntertainment:Relic-Core:master"
-
+    compile fileTree(dir: 'libs', include: '*.jar')
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
