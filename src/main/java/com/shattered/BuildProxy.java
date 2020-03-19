@@ -53,6 +53,15 @@ public class BuildProxy extends Build implements ChannelListener {
         //Sets the Server to LIVE.
         ServerConstants.LIVE = Boolean.parseBoolean(args[1]);
 
+        if (ServerConstants.LIVE) {
+            if (args.length < 3) {
+                SystemLogger.sendSystemErrMessage("Unsupported Arguments for LIVE! Current Args: " + args.length + ", Expected: (index, live, host)");
+                return;
+            }
+            ServerConstants.CENTRAL_HOST = args[2];
+        } else
+            ServerConstants.CENTRAL_HOST = "0.0.0.0";
+
         //Binds the socket and initializes the server
         getInstance().build(ServerType.PROXY, "0.0.0.0", ServerConstants.PROXY_DEFAULT_PORT);
 
