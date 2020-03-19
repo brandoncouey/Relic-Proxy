@@ -43,13 +43,15 @@ public class BuildProxy extends Build implements ChannelListener {
     public static void main(String[] args) {
 
         //Ensures valid port increments
-        if (args.length < 1) {
-            SystemLogger.sendSystemErrMessage("Unsupported Arguments! Current Args: " + args.length + ", Expected: (live)");
+        if (args.length < 2) {
+            SystemLogger.sendSystemErrMessage("Unsupported Arguments! Current Args: " + args.length + ", Expected: (index, live)");
             return;
         }
 
+        int portIndex = Integer.parseInt(args[0]);
+
         //Sets the Server to LIVE.
-        ServerConstants.LIVE = Boolean.parseBoolean(args[0]);
+        ServerConstants.LIVE = Boolean.parseBoolean(args[1]);
 
         //Binds the socket and initializes the server
         getInstance().build(ServerType.PROXY, "0.0.0.0", ServerConstants.PROXY_DEFAULT_PORT);
