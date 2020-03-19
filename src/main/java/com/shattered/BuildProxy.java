@@ -41,17 +41,25 @@ public class BuildProxy extends Build implements ChannelListener {
      * @param args
      */
     public static void main(String[] args) {
-            //TODO assign ip-port to bind via args
 
-            //Binds the socket and initializes the server
-            getInstance().build(ServerType.PROXY, "0.0.0.0", ServerConstants.PROXY_DEFAULT_PORT);
+        //Ensures valid port increments
+        if (args.length < 1) {
+            SystemLogger.sendSystemErrMessage("Unsupported Arguments! Current Args: " + args.length + ", Expected: (live)");
+            return;
+        }
 
-            //Connects to Central ServerConnections & Registers this Connection
-            getInstance().getNetwork().authenticate(ServerType.PROXY, getInstance().getNetwork().connect(ServerConstants.CENTRAL_HOST, ServerConstants.CENTRAL_DEFAULT_PORT), ProxySession.PROXY_TOKEN);
+        //Sets the Server to LIVE.
+        ServerConstants.LIVE = Boolean.parseBoolean(args[0]);
 
-            //Listens for Disconnects and Reconnection
-            ServerListenerThread thread = new ServerListenerThread();
-            thread.start();
+        //Binds the socket and initializes the server
+        getInstance().build(ServerType.PROXY, "0.0.0.0", ServerConstants.PROXY_DEFAULT_PORT);
+
+        //Connects to Central ServerConnections & Registers this Connection
+        getInstance().getNetwork().authenticate(ServerType.PROXY, getInstance().getNetwork().connect(ServerConstants.CENTRAL_HOST, ServerConstants.CENTRAL_DEFAULT_PORT), ProxySession.PROXY_TOKEN);
+
+        //Listens for Disconnects and Reconnection
+        ServerListenerThread thread = new ServerListenerThread();
+        thread.start();
 
     }
 
@@ -67,7 +75,7 @@ public class BuildProxy extends Build implements ChannelListener {
             @Override
             public void handle(Proxy.OpenConnection message, Session session) {
                 switch (message.getToken()) {
-                   
+
                     case ClientSession.CLIENT_TOKEN: {
                         if (ProxyRouting.getClientConnections().get(message.getUuid()) == null) {
                             ProxyRouting.getClientConnections().put(message.getUuid(), session.getChannel());
@@ -76,7 +84,7 @@ public class BuildProxy extends Build implements ChannelListener {
                         }
                         break;
                     }
-                    
+
                     case WorldSession.WORLD_TOKEN: {
                         if (ProxyRouting.getWorldConnections().get(message.getUuid()) != null) {
                             WorldSession worldSession = new WorldSession(session.getChannel(), message.getUuid());
@@ -85,7 +93,7 @@ public class BuildProxy extends Build implements ChannelListener {
                         }
                         break;
                     }
-                    
+
                     case RealmSession.REALM_TOKEN: {
                         if (ProxyRouting.getRealmSession() == null) {
                             RealmSession realmSession = new RealmSession(session.getChannel(), message.getUuid());
@@ -95,7 +103,7 @@ public class BuildProxy extends Build implements ChannelListener {
                         }
                         break;
                     }
-                    
+
                     default: {
                         //Ensures no authenticated connections connect.
                         SystemLogger.sendSystemErrMessage("P_OpenConnection -> Unhandled connection Cuuid=" + message.getUuid() + ", Token=" + message.getToken());
@@ -130,8 +138,8 @@ public class BuildProxy extends Build implements ChannelListener {
                         if (message.getPort() < 17000 || message.getPort() > 19000) {
                             //TODO request new connection
                             //TODO We MUST! Have a connection to a realm
-                           // SystemLogger.sendSystemErrMessage("BuildProxy -> P_TransferConnection: Unavailable Port=" + message.getPort());
-                           // return;
+                            // SystemLogger.sendSystemErrMessage("BuildProxy -> P_TransferConnection: Unavailable Port=" + message.getPort());
+                            // return;
                         }
 
                         //Disconnects from any current existing realm server
@@ -145,7 +153,7 @@ public class BuildProxy extends Build implements ChannelListener {
                         ChannelFuture future = BuildProxy.getInstance().getNetwork().connect(message.getHost(), message.getPort());
                         SystemLogger.sendSystemMessage("Transferring Realm Services... New Host=" + message.getHost() + ", Port=" + message.getPort());
                         if (future.isSuccess()) {
-                            
+
                             NetworkBootstrap.sendPacket(future.channel(), PacketOuterClass.Opcode.P_OpenConnection, Proxy.OpenConnection.newBuilder().setUuid(BuildProxy.getInstance().getNetwork().getConnectionUuid()).setToken(ProxySession.PROXY_TOKEN).build());
                             ProxyRouting.setRealmAddress(new InetSocketAddress(message.getHost(), message.getPort()));
                             //TODO send realm open_connection
